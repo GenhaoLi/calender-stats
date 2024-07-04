@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "calendar_stat"
+version = "0.1.0"
+description = ""
+authors = ["GenhaoLi <ligenhao20010916@gmail.com>"]
+readme = "README.md"
+packages = [{include = "calendar_stat"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+icalendar = "^5.0.13"
+requests = "^2.32.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
