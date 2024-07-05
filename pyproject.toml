@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "calendar_stats"
 version = "0.1.0"
-description = ""
+description = "Analyze calendar (.ics file) data"
 authors = ["GenhaoLi <ligenhao20010916@gmail.com>"]
 readme = "README.md"
 packages = [{include = "calendar_stats"}]

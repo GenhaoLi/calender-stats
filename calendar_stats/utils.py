@@ -61,8 +61,8 @@ def config_logger() -> logging.Logger:
     logger.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler()
-    debug_file_handler = logging.FileHandler(f'../data/debug_{current_time}.log', mode='w')
-    event_group_file_handler = logging.FileHandler(f'../data/{target_event_group_file_name}.txt', mode='w')
+    debug_file_handler = logging.FileHandler(f'./data/debug_{current_time}.log', mode='w')
+    event_group_file_handler = logging.FileHandler(f'./data/{target_event_group_file_name}.txt', mode='w')
 
     console_handler.setLevel(logging.DEBUG)
     debug_file_handler.setLevel(logging.DEBUG)
