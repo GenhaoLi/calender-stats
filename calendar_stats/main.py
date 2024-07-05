@@ -1,13 +1,18 @@
+import os
 from typing import TypedDict
 import logging
+from datetime import timedelta, datetime
 
 from icalendar import Calendar
-from datetime import timedelta, datetime
-from calendar_stat.utils import download_to_local
-from calendar_stat.utils import format_timedelta, truncate_time_zone
-from calendar_stat.utils import config_logger
+from dotenv import load_dotenv
 
-from calendar_stat.constants import EVENT_GROUP_NAME
+from calendar_stats.utils import download_to_local
+from calendar_stats.utils import format_timedelta, truncate_time_zone, target_event_group_file_name
+from calendar_stats.utils import config_logger
+from calendar_stats.utils import data_dir
+
+from calendar_stats.constants import TARGET_EVENT_GROUP_NAME
+
 
 logger = config_logger()
 
@@ -36,16 +41,16 @@ class EventGroup:
         logger.log(logging_level, f"[Event group]: \t{self.summary}\n"
                                   f"[Total time]: \t{format_timedelta(self.total_time)}\n")
 
-    def print_events(self):
+    def print_events(self, logging_level=logging.INFO):
         # sort events by start time
         self.events.sort(key=lambda e: e['start_time'])
-        logger.info(f'--- Events: {self.summary} ---')
+        logger.log(logging_level, f'--- Events: {self.summary} ---')
         for event in self.events:
-            logger.info(
-                # f"[Event]: \t{event['summary']}\n"
-                f"[Start]: \t{event['start_time']}\n"
-                f"[End]: \t\t{event['end_time']}\n"
-            )
+            logger.log(logging_level,
+                       # f"[Event]: \t{event['summary']}\n"
+                       f"[Start]: \t{event['start_time']}\n"
+                       f"[End]: \t\t{event['end_time']}\n"
+                       )
 
 
 def get_all_calendar_events(file_path):
@@ -77,8 +82,32 @@ def sort_event_groups_by_total_time(groups: list[EventGroup]):
     return list(sorted(groups, key=lambda group: group.total_time, reverse=True))
 
 
+def export_events_to_csv(events: list[CalendarEvent], export_path: str = None):
+    # events do not have to have the same name (summary)
+    total_time = sum([event['end_time'] - event['start_time'] for event in events], timedelta())
+
+    if not export_path:
+        export_path = f'{data_dir}/exported_events.csv'
+    with open(export_path, 'w') as f:
+        f.write("Event,Start,End,Duration (hh:mm:ss)\n")
+        for event in events:
+            f.write(f"{event['summary']},"
+                    f"{event['start_time']},"
+                    f"{event['end_time']},"
+                    f"{event['end_time'] - event['start_time']}\n")
+
+        # add a row for the total time
+        # total_time is a timedelta object, so we need to convert it to a string in the format hh:mm:ss
+        total_time = format_timedelta(total_time)
+        f.write(f"Total time,"
+                f","
+                f","
+                f"{total_time}\n")
+
+
 def main():
-    cal_url = "webcal://p64-caldav.icloud.com/published/2/MjEwODY5ODc4MDgyMTA4Nl17FPKq-Zz0karx_r5piMyxysCAYCaGV_ymLrFvKAl9PCp5PJTG5zFNEasDUSM5JAjg4V-JpoTkdbqgm5xX3ww"
+    load_dotenv()
+    cal_url = os.getenv('CALENDAR_URL')
     ics_file_path = download_to_local(cal_url)
 
     # Parse the .ics file
@@ -91,11 +120,12 @@ def main():
         group.print_total_time()
 
     # Print all events in the 'Work' group
-    work_event_group = event_group_dict[EVENT_GROUP_NAME]
+    work_event_group = event_group_dict[TARGET_EVENT_GROUP_NAME]
     work_event_group.print_total_time(logging_level=logging.INFO)
     work_event_group.print_events()
+    export_events_to_csv(work_event_group.events, f'{data_dir}/{target_event_group_file_name}.csv')
 
-    breakpoint()
+    # breakpoint()
 
 
 if __name__ == "__main__":

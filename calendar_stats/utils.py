@@ -5,8 +5,8 @@ from datetime import datetime
 import requests
 import logging
 
-import calendar_stat
-from calendar_stat.constants import EVENT_GROUP_NAME
+import calendar_stats
+from calendar_stats.constants import TARGET_EVENT_GROUP_NAME
 
 p = os.path
 
@@ -42,25 +42,27 @@ def format_timedelta(td):
     total_seconds = int(td.total_seconds())
     hours, remainder = divmod(total_seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
-    return f"{hours} hours, {minutes} minutes"
+    formatted_str = f"{hours}:{minutes:02d}:{seconds:02d}"
+    return formatted_str
 
 
 def truncate_time_zone(dt):
     return dt.replace(tzinfo=None)
 
-def get_today_date():
-    # get today's date, e.g. 2024-07-04
-    return datetime.now().strftime('%Y-%m-%d')
+def get_current_time():
+    return datetime.now().strftime("%Y-%m-%d %H:%M")
 
-today_date = get_today_date()
+current_time = get_current_time()
+
+target_event_group_file_name = f'{TARGET_EVENT_GROUP_NAME}_till_{current_time}'  # without extension
 
 def config_logger() -> logging.Logger:
-    logger = logging.getLogger(calendar_stat.__name__)
+    logger = logging.getLogger(calendar_stats.__name__)
     logger.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler()
-    debug_file_handler = logging.FileHandler('../data/debug.log', mode='w')
-    event_group_file_handler = logging.FileHandler(f'../data/{EVENT_GROUP_NAME}_till_{today_date}.txt', mode='w')
+    debug_file_handler = logging.FileHandler(f'../data/debug_{current_time}.log', mode='w')
+    event_group_file_handler = logging.FileHandler(f'../data/{target_event_group_file_name}.txt', mode='w')
 
     console_handler.setLevel(logging.DEBUG)
     debug_file_handler.setLevel(logging.DEBUG)

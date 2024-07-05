@@ -1,15 +1,19 @@
 [tool.poetry]
-name = "calendar_stat"
+name = "calendar_stats"
 version = "0.1.0"
 description = ""
 authors = ["GenhaoLi <ligenhao20010916@gmail.com>"]
 readme = "README.md"
-packages = [{include = "calendar_stat"}]
+packages = [{include = "calendar_stats"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 icalendar = "^5.0.13"
 requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.scripts]
+calendar_stats = "calendar_stats.main:main"
 
 
 [build-system]
