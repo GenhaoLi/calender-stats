@@ -6,7 +6,7 @@ import requests
 import logging
 
 import calendar_stats
-from calendar_stats.constants import TARGET_EVENT_GROUP_NAME
+from calendar_stats.constants import TARGET_EVENT_GROUP_NAME, FROM_TIME
 
 p = os.path
 
@@ -54,7 +54,7 @@ def get_current_time():
 
 current_time = get_current_time()
 
-target_event_group_file_name = f'{TARGET_EVENT_GROUP_NAME}_till_{current_time}'  # without extension
+target_event_group_file_name = f'{TARGET_EVENT_GROUP_NAME}_from_{FROM_TIME}_to_{current_time}'  # without extension
 
 def config_logger() -> logging.Logger:
     logger = logging.getLogger(calendar_stats.__name__)

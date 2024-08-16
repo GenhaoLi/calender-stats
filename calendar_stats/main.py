@@ -11,7 +11,7 @@ from calendar_stats.utils import format_timedelta, truncate_time_zone, target_ev
 from calendar_stats.utils import config_logger
 from calendar_stats.utils import data_dir
 
-from calendar_stats.constants import TARGET_EVENT_GROUP_NAME
+from calendar_stats.constants import TARGET_EVENT_GROUP_NAME, FROM_TIME
 
 
 logger = config_logger()
@@ -32,10 +32,9 @@ class EventGroup:
     def add_event(self, new_event: CalendarEvent):
         # ignore events that have not ended yet
         now = datetime.now()
-        if new_event['end_time'] > now:
-            return
-        self.events.append(new_event)
-        self.total_time += new_event['end_time'] - new_event['start_time']
+        if datetime.strptime(FROM_TIME, '%Y-%m-%d %H:%M') < new_event['end_time'] < now:
+            self.events.append(new_event)
+            self.total_time += new_event['end_time'] - new_event['start_time']
 
     def print_total_time(self, logging_level=logging.DEBUG):
         logger.log(logging_level, f"[Event group]: \t{self.summary}\n"
